@@ -297,6 +297,42 @@ def catalog_resource( context, resource, inventory, chassis_id ):
                     description_str = description_str + " Storage Controller"
         catalog["Description"] = description_str.strip()
 
+    # Determine the relative repairable unit
+    relative_repairable_unit = None
+    prop_list = []
+    if resource_type == "Chassis":
+        if "Links" in resource:
+            if "ContainedBy" in resource["Links"]:
+                if "@odata.id" in resource["Links"]["ContainedBy"]:
+                    relative_repairable_unit = resource["Links"]["ContainedBy"]["@odata.id"]
+    elif resource_type == "Processor":
+        if "Links" in resource:
+            if "Chassis" in resource["Links"]:
+                if "@odata.id" in resource["Links"]["Chassis"]:
+                    relative_repairable_unit = resource["Links"]["Chassis"]["@odata.id"]
+    elif resource_type == "Memory":
+        if "Links" in resource:
+            if "Chassis" in resource["Links"]:
+                if "@odata.id" in resource["Links"]["Chassis"]:
+                    relative_repairable_unit = resource["Links"]["Chassis"]["@odata.id"]
+    elif resource_type == "Drive":
+        if "Links" in resource:
+            if "Chassis" in resource["Links"]:
+                if "@odata.id" in resource["Links"]["Chassis"]:
+                    relative_repairable_unit = resource["Links"]["Chassis"]["@odata.id"]
+    elif resource_type == "PCIeDevice":
+        pass
+    elif resource_type == "StorageController":
+        pass
+    elif resource_type == "NetworkAdapter":
+        pass
+    elif resource_type == "Switch":
+        pass
+    if relative_repairable_unit is None:
+        # No handling set up for this resource type
+        pass
+    catalog["RelativeRepairableUnitUri"] = relative_repairable_unit
+
     # Find the inventory instance to update based on the chassis identifier
     inventory_instance = None
     for chassis_inventory in inventory:
